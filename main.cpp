@@ -1,4 +1,4 @@
-#include "server.hpp"
+#include "Server.hpp"
 
 // int getaddrinfo(const char *node,   // e.g. "www.example.com" or IP
 //             const char *service,  // e.g. "http" or port number
@@ -58,13 +58,23 @@
 	// close(clientSocket);
 	// close(my_socket);
 	// return (0);
-	// // close the listening socket
-	// // while receiving display echo message
-	// // close socket
+	// close the listening socket
+	// while receiving display echo message
+	// close socket
 
 int main(int ac, char **av)
 {
 	if (ac != 3)
-		exit(0);
-	
+		return 1;
+	try
+	{
+		Server myServer(av[1], av[2]);
+		myServer.server_init();
+		myServer.main_loop();
+	}
+	catch (const std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
+		return 1;
+	}
 }
