@@ -73,9 +73,14 @@ void Server::receive_new_data(int i)
 	if (bytesReceived == -1)
 		throw std::runtime_error("Error: recv failed");
 	if (bytesReceived == 0)
+	{
 		std::cout << sockets[i].fd << "Client disconnected" << std::endl;
+		close(sockets[i].fd);
+		sockets.erase(sockets.begin() + i);
+		client_vector.erase(client_vector.begin() + (i - 1));
+	}
 	else
-		std::cout << client_vector[i].get_client_fd() << "client: " << std::string(buffer, 0, bytesReceived) << std::endl;
+		std::cout << client_vector[i - 1].get_client_fd() << "client: " << std::string(buffer, 0, bytesReceived) << std::endl;
 }
 
 
