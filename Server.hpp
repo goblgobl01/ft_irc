@@ -17,8 +17,8 @@
 class Client {
 	private:
 		int client_socket;
-		std::string buffer; 
 	public:
+		std::string buffer;
 		Client(int _client_socket);
 		int get_client_fd();
 };

@@ -68,11 +68,11 @@ void Server::accept_new_client()
 void Server::receive_new_data(int i)
 {
 	char buffer[4096];
+	size_t n = 0;
+
 	memset(buffer, 0, 4096);
 	int bytesReceived = recv(sockets[i].fd, buffer, 4096, 0);
-	if (bytesReceived == -1)
-		throw std::runtime_error("Error: recv failed");
-	if (bytesReceived == 0)
+	if (bytesReceived <= 0)
 	{
 		std::cout << sockets[i].fd << "Client disconnected" << std::endl;
 		close(sockets[i].fd);
@@ -80,7 +80,15 @@ void Server::receive_new_data(int i)
 		client_vector.erase(client_vector.begin() + (i - 1));
 	}
 	else
-		std::cout << client_vector[i - 1].get_client_fd() << "client: " << std::string(buffer, 0, bytesReceived) << std::endl;
+	{
+		while(n < client_vector.size())
+		{
+			if (client_vector[n].get_client_fd() == sockets[i].fd)
+				this->client_vector[n].buffer.append(buffer);
+			n++;
+		}
+	}
+	std::cout << client_vector[n].get_client_fd() << "client: " << std::string(buffer, 0, bytesReceived) << std::endl;
 }
 
 
