@@ -1,11 +1,5 @@
 #include "Server.hpp"
 
-Client::Client(int _client_socket) : client_socket(_client_socket) {}
-int Client::get_client_fd()
-{
-	return (client_socket);
-}
-
 Server::Server(std::string port_str, std::string _passwd) : passwd(_passwd) {
 	if (port_str.empty() || port_str.find_first_not_of("0123456789") != std::string::npos)
 		throw std::runtime_error("Error: Invalid port characters");
@@ -65,6 +59,174 @@ void Server::accept_new_client()
 	std::cout << new_client.get_client_fd() << "Client connected" << std::endl;
 }
 
+void Server::close_clients()
+{
+	for(size_t i = 0; i < client_vector.size(); i++)
+	{
+		std::cout << "Client <" << client_vector[i].get_client_fd() << "> Disconnected" << std::endl;
+		close(client_vector[i].get_client_fd());
+	}
+	if (server_socket != -1)
+	{
+		std::cout << "Server <" << server_socket << "> Disconnected" << std::endl;
+		close(server_socket);
+	}
+}
+
+void Server::remove_a_client(Client &client)
+{
+	size_t i = 0;
+
+	while (i < sockets.size())
+	{
+		if (sockets[i].fd == client.get_client_fd())
+		{
+			sockets.erase(sockets.begin() + i);
+			break;
+		}
+		i++;
+	}
+	i = 0;
+	while (i < client_vector.size())
+	{
+		if (client_vector[i].get_client_fd() == client.get_client_fd())
+		{
+			close(client.get_client_fd());
+			client_vector.erase(client_vector.begin() + i);
+			break ;
+		}
+		i++;
+	}
+}
+
+std::string string_to_upper(std::string _string)
+{
+	for (size_t i = 0; i < _string.length(); ++i)
+			_string[i] = std::toupper(_string[i]);
+	return _string;
+}
+
+void Server::send_error(int client_fd, std::string code, std::string nickname, std::string command, std::string message)
+{
+	std::string response = ":localhost " + code + " " + nickname + " " + command + " :" + message + "\r\n";
+	send(client_fd, response.c_str(), response.length(), 0);
+}
+
+void Server::parse_buffer(Client &client)
+{
+	std::string &buf = client.get_buffer();
+	size_t pos;
+
+	while ((pos = buf.find("\r\n")) != std::string::npos)
+	{
+		std::string line = buf.substr(0, pos);
+		buf.erase(0, pos + 2);
+		if (line.empty())
+			continue;
+		std::stringstream ss(line);
+		std::string command;
+		std::string content;
+
+		ss >> command;
+		command = string_to_upper(command);
+		if (command == "PASS")
+		{
+			if (!(ss >> content))
+				send_error(client.get_client_fd(), "461", "*", "PASS", "password cant be empty");
+			else if (client.pass_status() == true)
+				send_error(client.get_client_fd(), "462", "*", "PASS", "already connected");
+			else if (content == this->passwd)
+				client.set_pass(true);
+			else
+			{
+				// send_error(client.get_client_fd(), "464", "*", "PASS", "pass_missmatch");
+				remove_a_client(client);
+				return ;
+			}
+		}
+		else if (command == "NICK")
+		{
+			if (!client.pass_status())
+			{
+				send_error(client.get_client_fd(), "451", "*", "NICK", "not authenticated yet");
+				continue ;
+			}
+			else if (!(ss >> content))
+			{
+				send_error(client.get_client_fd(), "431", "*", "NICK", "No nickname given");
+				continue ;
+			}
+			bool found_duplicate = false;
+			for (size_t i = 0; i < client_vector.size(); ++i)
+			{
+				if (client_vector[i].get_client_fd() != client.get_client_fd())
+				{
+					if (client_vector[i].nick_status())
+						if (string_to_upper(client_vector[i].get_nickname()) == string_to_upper(content))
+						{
+							found_duplicate = true;
+							break ;
+						}
+				}
+			}
+			if (!found_duplicate)
+			{
+				client.set_nick(true);
+				client.set_nickname(content);
+			}
+			else
+				send_error(client.get_client_fd(), "433", "*", content, "Nickname is already in use");
+			if (client.is_registered())
+			{
+				std::string welcome = ":localhost 001 " + client.get_nickname() + " :Welcome to the Internet Relay Network " + client.get_nickname() + "\r\n";
+				send(client.get_client_fd(), welcome.c_str(), welcome.length(), 0);
+			}
+		}
+		else if (command == "USER")
+		{
+			if (!client.pass_status())
+			{
+				send_error(client.get_client_fd(), "451", "*", "USER", "You have not registered");
+				continue;
+			}
+			if (client.user_status())
+			{
+				send_error(client.get_client_fd(), "462", client.get_nickname(), "USER", "Unauthorized command (already registered)");
+				continue;
+			}
+			std::string user, host, server, real;
+			if (!(ss >> user >> host >> server))
+			{
+				send_error(client.get_client_fd(), "461", client.get_nickname().empty() ? "*" : client.get_nickname(), "USER", "Not enough parameters");
+				continue;
+			}
+			std::getline(ss, real);
+			if (real.empty() || real.find_first_not_of(" \t\r\n") == std::string::npos)
+			{
+				send_error(client.get_client_fd(), "461", client.get_nickname().empty() ? "*" : client.get_nickname(), "USER", "Not enough parameters");
+				continue;
+			}
+			size_t colon_pos = real.find(':');
+			if (colon_pos != std::string::npos)
+				real = real.substr(colon_pos + 1);
+			else
+			{
+				size_t first = real.find_first_not_of(" ");
+				if (first != std::string::npos)
+					real = real.substr(first);
+			}
+			client.set_username(user);
+			client.set_realname(real);
+			client.set_user(true);
+			if (client.is_registered())
+			{
+				std::string welcome = ":localhost 001 " + client.get_nickname() + " :Welcome to our Internet Relay Network " + client.get_nickname() + "\r\n";
+				send(client.get_client_fd(), welcome.c_str(), welcome.length(), 0);
+			}
+		}
+	}
+}
+
 void Server::receive_new_data(int i)
 {
 	char buffer[4096];
@@ -72,6 +234,7 @@ void Server::receive_new_data(int i)
 
 	memset(buffer, 0, 4096);
 	int bytesReceived = recv(sockets[i].fd, buffer, 4096, 0);
+	std::cout << buffer <<std::endl;
 	if (bytesReceived <= 0)
 	{
 		std::cout << sockets[i].fd << "Client disconnected" << std::endl;
@@ -84,11 +247,13 @@ void Server::receive_new_data(int i)
 		while(n < client_vector.size())
 		{
 			if (client_vector[n].get_client_fd() == sockets[i].fd)
-				this->client_vector[n].buffer.append(buffer);
+			{
+				this->client_vector[n].set_buffer(buffer);
+				parse_buffer(client_vector[n]);
+			}
 			n++;
 		}
 	}
-	std::cout << client_vector[n].get_client_fd() << "client: " << std::string(buffer, 0, bytesReceived) << std::endl;
 }
 
 
@@ -107,7 +272,9 @@ void Server::main_loop()
 				if (sockets[i].fd == this->server_socket)
 					accept_new_client();
 				else
+				{
 					receive_new_data(i);
+				}
 			}
 			i++;
 		}
