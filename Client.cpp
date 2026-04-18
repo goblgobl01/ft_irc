@@ -1,8 +1,13 @@
 #include "Client.hpp"
+#include <iostream>
 
+<<<<<<< HEAD
 // Client::Client(int _client_socket) : client_socket(_client_socket) {}
 
 Client::Client(int _client_socket) : client_socket(_client_socket), pass(false), nick(false), user(false) {}
+=======
+Client::Client(int _client_socket) : client_socket(_client_socket), pass(false), nick(false), user(false){}
+>>>>>>> origin/Mohammed
 
 int Client::get_client_fd()
 {
@@ -31,4 +36,8 @@ std::string Client::get_username() const { return this->username; }
 std::string Client::get_realname() const { return this->realname; }
 std::string Client::get_nickname() { return this->nickname; }
 void Client::set_nickname(std::string _string) { this->nickname = _string; }
-bool Client::is_registered() const { return (this->pass && this->nick && this->user); }
+bool Client::is_registered() const
+{
+	std::cout << "pass: " << this->pass << "nick: " << this->nick << "user: " << this->user << std::endl;
+	return (this->pass && this->nick && this->user);
+}
