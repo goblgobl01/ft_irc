@@ -72,6 +72,7 @@ void Server::receive_new_data(int i)
 
 	memset(buffer, 0, 4096);
 	int bytesReceived = recv(sockets[i].fd, buffer, 4096, 0);
+	std::cout << bytesReceived << ":" << buffer << std::endl;
 	if (bytesReceived <= 0)
 	{
 		std::cout << sockets[i].fd << "Client disconnected" << std::endl;
