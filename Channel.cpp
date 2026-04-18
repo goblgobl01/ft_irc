@@ -52,3 +52,5 @@ void	Channel::set_invit_only(bool inviteOnly) {
 void	Channel::set_topic_restricted(bool topicRestricted) {
     this->topicRestricted = topicRestricted;
 }
+
+

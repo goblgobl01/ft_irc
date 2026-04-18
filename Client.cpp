@@ -1,6 +1,8 @@
 #include "Client.hpp"
 
-Client::Client(int _client_socket) : client_socket(_client_socket) {}
+// Client::Client(int _client_socket) : client_socket(_client_socket) {}
+
+Client::Client(int _client_socket) : client_socket(_client_socket), pass(false), nick(false), user(false) {}
 
 int Client::get_client_fd()
 {

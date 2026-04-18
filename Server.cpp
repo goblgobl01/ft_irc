@@ -230,8 +230,6 @@ void Server::parse_buffer(Client &client)
 				send(client.get_client_fd(), welcome.c_str(), welcome.length(), 0);
 			}
 		}
-		else
-			handle_command(command);
 	}
 }
 
