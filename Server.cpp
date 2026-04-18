@@ -115,20 +115,25 @@ void Server::send_error(int client_fd, std::string code, std::string nickname, s
 void Server::parse_buffer(Client &client)
 {
 	std::string &buf = client.get_buffer();
-	size_t pos;
+	size_t pos = 0;
 
-	while ((pos = buf.find("\r\n")) != std::string::npos)
+	while ((pos = buf.find('\n')) != std::string::npos)
 	{
 		std::string line = buf.substr(0, pos);
-		buf.erase(0, pos + 2);
+		buf.erase(0, pos + 1);
+		if (!line.empty() && line[line.size() - 1] == '\r')
+			line.erase(line.size() - 1);
+
 		if (line.empty())
 			continue;
+
 		std::stringstream ss(line);
 		std::string command;
 		std::string content;
 
 		ss >> command;
 		command = string_to_upper(command);
+
 		if (command == "PASS")
 		{
 			if (!(ss >> content))
@@ -136,10 +141,11 @@ void Server::parse_buffer(Client &client)
 			else if (client.pass_status() == true)
 				send_error(client.get_client_fd(), "462", "*", "PASS", "already connected");
 			else if (content == this->passwd)
+			{
 				client.set_pass(true);
+			}
 			else
 			{
-				// send_error(client.get_client_fd(), "464", "*", "PASS", "pass_missmatch");
 				remove_a_client(client);
 				return ;
 			}
