@@ -123,17 +123,13 @@ void Server::parse_buffer(Client &client)
 		buf.erase(0, pos + 1);
 		if (!line.empty() && line[line.size() - 1] == '\r')
 			line.erase(line.size() - 1);
-
 		if (line.empty())
 			continue;
-
 		std::stringstream ss(line);
 		std::string command;
 		std::string content;
-
 		ss >> command;
 		command = string_to_upper(command);
-
 		if (command == "PASS")
 		{
 			if (!(ss >> content))
