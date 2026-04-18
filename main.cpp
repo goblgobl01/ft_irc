@@ -1,5 +1,11 @@
 #include "Server.hpp"
 
+/*
+1:	PASS "password"
+2:	NICK "nickname"
+3:	USER "username" "hostname" "servername" : "full real name"
+*/
+
 int main(int ac, char **av)
 {
 	if (ac != 3)
