@@ -13,15 +13,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <fcntl.h>
-
-class Client {
-	private:
-		int client_socket;
-	public:
-		std::string buffer;
-		Client(int _client_socket);
-		int get_client_fd();
-};
+#include "Client.hpp"
 
 class Server {
 	private:
@@ -35,5 +27,9 @@ class Server {
 		void server_init();
 		void main_loop();
 		void accept_new_client();
-		void receive_new_data(int i); 
+		void receive_new_data(int i);
+		void parse_buffer(Client &client);
+		void remove_a_client(Client &client);
+		void close_clients();
+		void send_error(int client_fd, std::string code, std::string nickname, std::string command, std::string message);
 };

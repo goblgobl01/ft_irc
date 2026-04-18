@@ -9,6 +9,7 @@ int main(int ac, char **av)
 		Server myServer(av[1], av[2]);
 		myServer.server_init();
 		myServer.main_loop();
+		myServer.close_clients();
 	}
 	catch (const std::exception &e)
 	{
