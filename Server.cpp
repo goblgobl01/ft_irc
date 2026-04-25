@@ -1,11 +1,5 @@
 #include "Server.hpp"
 
-void	handle_command(std::string command)
-{
-	if (command == "JOIN")
-		std::cout << "Hello From Join" << std::endl;
-}
-
 Server::Server(std::string port_str, std::string _passwd) : passwd(_passwd) {
 	if (port_str.empty() || port_str.find_first_not_of("0123456789") != std::string::npos)
 		throw std::runtime_error("Error: Invalid port characters");
@@ -232,6 +226,8 @@ void Server::parse_buffer(Client &client)
 				send(client.get_client_fd(), welcome.c_str(), welcome.length(), 0);
 			}
 		}
+		else
+			handleCommands(client, command, ss);
 	}
 }
 

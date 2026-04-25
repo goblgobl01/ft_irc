@@ -14,6 +14,15 @@
 #include <stdexcept>
 #include <fcntl.h>
 #include "Client.hpp"
+#include "Channel.hpp"
+
+#define SEND_ERROR_RETURN(client, code, target, msg) \
+    send_error((client).get_client_fd(), code, (client).get_nickname(), target, msg); \
+    return ;
+
+#define SEND_ERROR_CONTINUE(client, code, target, msg) \
+    send_error((client).get_client_fd(), code, (client).get_nickname(), target, msg); \
+    continue ;
 
 class Server {
 	private:
@@ -22,6 +31,7 @@ class Server {
 		std::string passwd;
 		std::vector<struct pollfd> sockets;
 		std::vector<Client> client_vector;
+		std::vector<Channel> channel_vector;
 	public:
 		Server(std::string port, std::string _passwd);
 		void server_init();
@@ -32,4 +42,41 @@ class Server {
 		void remove_a_client(Client &client);
 		void close_clients();
 		void send_error(int client_fd, std::string code, std::string nickname, std::string command, std::string message);
+		
+		// -------------------- handleJoin -----------------------
+		
+		void    joinChannel(Client &client, const std::string &chanName, const std::string &chanKey);
+		void    syncProtocol(Client &client, Channel *channel, const std::string &chanName);
+		
+		// -------------------- handlePrivmsg -----------------------
+		std::string	extractMessage(std::stringstream &ss);
+		void	privmsgToUser(Client &client, const std::string &target, const std::string &message);
+		void	privmsgToChannel(Client &client, const std::string &target, const std::string &message);
+		
+		
+		// -------------------- Utils ----------------------- √
+
+		std::string	getClientPrefix(Client &client);
+		Channel	*findChannel(const std::string &name);
+		Client	*findClientByNick(const std::string &nickname);
+		void	sendToClient(int fd, const std::string &message);
+		void	removeClientFromAllChannels(Client &client);
+		void	handleCommands(Client &client, std::string &command, std::stringstream &ss);
+		
+		// -------------------- Commands ----------------------- √
+
+		void	handlePrivmsg(Client &client, std::stringstream &ss);
+		void	handlePing(Client &client, std::stringstream &ss);
+		void	handleQuit(Client &client);
+
+		// -------------------- userCommands ----------------------- √
+
+		void	handleJoin(Client &client, std::stringstream &ss);
+		void	handlePart(Client &client, std::stringstream &ss);
+
+		// -------------------- operatorCommands ----------------------- √
+		void	handleKick(Client &client, std::stringstream &ss);
+		void	handleInvite(Client &client, std::stringstream &ss);
+		void	handleTopic(Client &client, std::stringstream &ss);
+		void	handleMode(Client &client, std::stringstream &ss);
 };

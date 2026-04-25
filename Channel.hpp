@@ -10,54 +10,51 @@ class   Client;
 class   Channel
 {
 	private:
-		int		userLimit;
-		bool	inviteOnly;
-		bool	topicRestricted;
-		std::string	name;
-		std::string	pass; // key
-		std::string	topic;
-		std::vector<Client>	members;
-		std::vector<Client>	operators;
-		std::vector<Client>	inviteList;
-	public:
+		int						userLimit;
+		bool					inviteOnly;
+		bool					topicRestricted;
+		std::string				key;
+		std::string				name;
+		std::string				topic;
+		std::vector<Client *>	members;
+		std::vector<Client *>	operators;
+		std::vector<Client *>	inviteList;
+
+	public:		
 		Channel();
-		Channel(std::string &name);
+		Channel(const std::string &name);
 		~Channel();
-		
-		// getters
+
+
 		std::string	getName() const;
-		std::string	getPass() const;
+		std::string	getKey() const;
 		std::string	getTopic() const;
-		int	getUserLimit() const;
-		bool	isInviteOnly() const;
-		bool	isTopicRestricted() const;
+		int			getUserLimit() const;
+		bool		isInviteOnly() const;
+		bool    	isTopicRestricted() const;
+
+
+		void    setTopic(const std::string &topic);
+		void    setKey(const std::string &key);
+		void    setUserLimit(int limit);
+		void    setInviteOnly(bool status);
+		void    setTopicRestricted(bool status);
+
+
+		bool	isMember(Client *client) const;
+		bool	isOperator(Client *client) const;
+		bool	isInvited(Client *client) const;
+		void    addInvite(Client *client);
 		
-		// setters
-		void	set_topic(std::string &topic);
-		void	set_pass(std::string &pass);
-		void	set_user_limit(int user_limit);
-		void	set_invit_only(bool is_invite_only);
-		void	set_topic_restricted(bool is_topic_restricted);
 
-		// member management
-		void	addMember();
-		void	removeMember();
-		void	isMember();
-		void	memberCount();
-		void	getMemberList();
-
-		// operator management
-		void	addOperator();
-		void	removeOperator();
-		void	isOperator();
-
-		// invite management
-		void	addInvite();
-		void	removeInvite();
-		void	isInvited();
-
-		// broadcast
-		void	broadcastMessage(std::string &message, std::vector<Client> exclude);
+		std::string	getMemberList() const;
+		size_t		memberCount() const;
+		void		removeOperator(Client *client);
+		void		addMember(Client *client);
+		void		removeMember(Client *client);
+		void		addOperator(Client *client);
+		void		removeInvite(Client *client);
+		void		broadcastMessage(const std::string &message, Client *exclude);
 };
 
 #endif

@@ -5,10 +5,10 @@
 class Client {
 	private:
 		int			client_socket;
-		std::string	buffer;
 		bool		pass;
 		bool		nick;
 		bool		user;
+		std::string	buffer;
 		std::string	nickname;
 		std::string	username;
 		std::string	realname;

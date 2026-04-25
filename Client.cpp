@@ -1,26 +1,17 @@
 #include "Client.hpp"
 #include <iostream>
 
-<<<<<<< HEAD
-// Client::Client(int _client_socket) : client_socket(_client_socket) {}
-
-Client::Client(int _client_socket) : client_socket(_client_socket), pass(false), nick(false), user(false) {}
-=======
 Client::Client(int _client_socket) : client_socket(_client_socket), pass(false), nick(false), user(false){}
->>>>>>> origin/Mohammed
 
-int Client::get_client_fd()
-{
+int Client::get_client_fd() {
 	return (client_socket);
 }
 
-void Client::set_buffer(std::string _string)
-{
+void Client::set_buffer(std::string _string) {
 	this->buffer.append(_string);
 }
 
-std::string &Client::get_buffer()
-{
+std::string &Client::get_buffer() {
 	return (buffer);
 }
 
