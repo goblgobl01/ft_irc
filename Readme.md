@@ -1,0 +1,41 @@
+Commands
+    handleQuit
+    handlePing
+    handlePrivmsg
+        extractMessage
+        privmsgToUser
+        privmsgToChannel
+User
+    handlePart
+    handleJoin
+        syncProtocol
+        joinChannel
+Operator
+    handleKick
+    handleInvite
+    handleTopic
+    handleMode
+
+
+Channel
+    isMember
+    isOperator
+    inInvited
+    addInvite
+    ------
+    getMemberList
+    memberCount
+    removeOperator
+    ------
+    addMember
+    removeMember
+    addOperator
+    removeInvite
+    broadcastMessage
+Utils
+    getClientPrefix
+    findChannel
+    findClientByNick
+    sendToClient
+    removeClientFromAllChannels
+    handleCommands

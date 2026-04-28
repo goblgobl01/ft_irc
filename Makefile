@@ -3,7 +3,13 @@ NAME = ircserv
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -g
 
-SRC = main.cpp Server.cpp Client.cpp Channel.cpp Utils.cpp Commands.cpp userCommands.cpp operatorCommands.cpp
+SRC = main.cpp Server.cpp Client.cpp Channel.cpp\
+		cmds/handleJoin.cpp cmds/handlePart.cpp cmds/handlePing.cpp\
+		cmds/handlePrivmsg.cpp cmds/handleQuit.cpp\
+		commands/handleCommands.cpp commands/handleInvite.cpp\
+		commands/handleKick.cpp commands/handleMode.cpp\
+		commands/handleTopic.cpp commands/utils.cpp
+		
 OBJ = $(SRC:%.cpp=obj/%.o)
 
 all: $(NAME)
@@ -12,7 +18,7 @@ $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 
 obj/%.o: %.cpp
-	mkdir -p obj
+	mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:

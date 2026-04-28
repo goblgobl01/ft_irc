@@ -29,6 +29,7 @@ std::string Client::get_nickname() { return this->nickname; }
 void Client::set_nickname(std::string _string) { this->nickname = _string; }
 bool Client::is_registered() const
 {
-	std::cout << "pass: " << this->pass << "nick: " << this->nick << "user: " << this->user << std::endl;
+	// std::cout << "pass: " << this->pass << "nick: " << this->nick << "user: " << this->user << std::endl;
 	return (this->pass && this->nick && this->user);
 }
+

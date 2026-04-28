@@ -6,8 +6,6 @@ Channel::Channel() : userLimit(0), inviteOnly(false), topicRestricted(false) {}
 Channel::Channel(const std::string &name) : userLimit(0), inviteOnly(false), topicRestricted(false), name(name) {}
 Channel::~Channel() {}
 
-
-
 std::string Channel::getName() const { return (this->name); }
 std::string Channel::getKey() const { return (this->key); }
 std::string Channel::getTopic() const { return (this->topic); }
@@ -15,15 +13,11 @@ int         Channel::getUserLimit() const { return (this->userLimit); }
 bool	    Channel::isInviteOnly() const { return (this->inviteOnly); }
 bool        Channel::isTopicRestricted() const { return this->topicRestricted; }
 
-
-
 void    Channel::setTopic(const std::string &topic) { this->topic = topic; }
 void    Channel::setKey(const std::string &key) { this->key = key; }
 void    Channel::setUserLimit(int limit) { this->userLimit = limit; }
 void    Channel::setInviteOnly(bool status) { this->inviteOnly = status; }
 void    Channel::setTopicRestricted(bool status) { this->topicRestricted = status; }
-
-
 
 bool    Channel::isMember(Client *client) const {
     for (size_t i = 0; i < members.size(); i++)
@@ -53,8 +47,6 @@ void    Channel::addInvite(Client *client) {
     if (!isInvited(client))
         inviteList.push_back(client);
 }
-
-
 
 std::string Channel::getMemberList() const {
     std::string list;
@@ -122,4 +114,3 @@ void    Channel::broadcastMessage(const std::string &message, Client *exclude) {
         }
     }
 }
-

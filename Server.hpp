@@ -16,14 +16,6 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 
-#define SEND_ERROR_RETURN(client, code, target, msg) \
-    send_error((client).get_client_fd(), code, (client).get_nickname(), target, msg); \
-    return ;
-
-#define SEND_ERROR_CONTINUE(client, code, target, msg) \
-    send_error((client).get_client_fd(), code, (client).get_nickname(), target, msg); \
-    continue ;
-
 class Server {
 	private:
 		int port;
@@ -46,7 +38,7 @@ class Server {
 		// -------------------- handleJoin -----------------------
 		
 		void    joinChannel(Client &client, const std::string &chanName, const std::string &chanKey);
-		void    syncProtocol(Client &client, Channel *channel, const std::string &chanName);
+		void    announceJoin(Client &client, Channel *channel, const std::string &chanName);
 		
 		// -------------------- handlePrivmsg -----------------------
 		std::string	extractMessage(std::stringstream &ss);
