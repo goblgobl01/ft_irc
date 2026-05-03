@@ -1,6 +1,6 @@
-#include "../Server.hpp"
-#include "../Client.hpp"
-#include "../Channel.hpp"
+#include "../../includes/Client.hpp"
+#include "../../includes/Server.hpp"
+#include "../../includes/Channel.hpp"
 
 void    Server::handleInvite(Client &client, std::stringstream &ss)
 {
@@ -12,8 +12,8 @@ void    Server::handleInvite(Client &client, std::stringstream &ss)
     if (!(ss >> targetNick >> channelName))
     {
         send_error(fd, "461", nick, "INVITE", "Not enough parameters");
-        return ;
     }
+        return ;
     Channel *channel = findChannel(channelName);
     if (!channel)
     {

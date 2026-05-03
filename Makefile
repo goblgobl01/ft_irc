@@ -3,12 +3,10 @@ NAME = ircserv
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 -g
 
-SRC = main.cpp Server.cpp Client.cpp Channel.cpp\
-		cmds/handleJoin.cpp cmds/handlePart.cpp cmds/handlePing.cpp\
-		cmds/handlePrivmsg.cpp cmds/handleQuit.cpp\
-		commands/handleCommands.cpp commands/handleInvite.cpp\
-		commands/handleKick.cpp commands/handleMode.cpp\
-		commands/handleTopic.cpp commands/utils.cpp
+SRC = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp\
+		src/cmds/handleMode.cpp src/cmds/handleCmds.cpp src/cmds/utils.cpp src/cmds/handlePart.cpp\
+		src/cmds/handleJoin.cpp src/cmds/handlePing.cpp src/cmds/handlePrivmsg.cpp src/cmds/handleQuit.cpp\
+		src/cmds/handleInvite.cpp src/cmds/handleKick.cpp src/cmds/handleTopic.cpp
 		
 OBJ = $(SRC:%.cpp=obj/%.o)
 

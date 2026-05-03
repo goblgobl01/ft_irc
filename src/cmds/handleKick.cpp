@@ -1,6 +1,6 @@
-#include "../Server.hpp"
-#include "../Client.hpp"
-#include "../Channel.hpp"
+#include "../../includes/Server.hpp"
+#include "../../includes/Client.hpp"
+#include "../../includes/Channel.hpp"
 
 void    Server::handleKick(Client &client, std::stringstream &ss)
 {

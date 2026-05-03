@@ -46,27 +46,30 @@ class Server {
 		void	privmsgToChannel(Client &client, const std::string &target, const std::string &message);
 		
 		
-		// -------------------- Utils ----------------------- √
+		// -------------------- Utils -----------------------
 
 		std::string	getClientPrefix(Client &client);
 		Channel	*findChannel(const std::string &name);
 		Client	*findClientByNick(const std::string &nickname);
 		void	sendToClient(int fd, const std::string &message);
-		void	removeClientFromAllChannels(Client &client);
+		// void	removeClientFromAllChannels(Client &client);
+		void	removeClientFromAllChannels(Client &client, const std::string &reason);
+
 		void	handleCommands(Client &client, std::string &command, std::stringstream &ss);
 		
-		// -------------------- Commands ----------------------- √
+		// -------------------- Commands -----------------------
 
 		void	handlePrivmsg(Client &client, std::stringstream &ss);
 		void	handlePing(Client &client, std::stringstream &ss);
-		void	handleQuit(Client &client);
+		// void	handleQuit(Client &client);
+		void	handleQuit(Client &client, std::stringstream &ss);
 
-		// -------------------- userCommands ----------------------- √
+		// -------------------- userCommands -----------------------
 
 		void	handleJoin(Client &client, std::stringstream &ss);
 		void	handlePart(Client &client, std::stringstream &ss);
 
-		// -------------------- operatorCommands ----------------------- √
+		// -------------------- operatorCommands -----------------------
 		void	handleKick(Client &client, std::stringstream &ss);
 		void	handleInvite(Client &client, std::stringstream &ss);
 		void	handleTopic(Client &client, std::stringstream &ss);

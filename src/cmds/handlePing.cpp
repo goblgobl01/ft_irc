@@ -1,6 +1,6 @@
-#include "../Channel.hpp"
-#include "../Client.hpp"
-#include "../Server.hpp"
+#include "../../includes/Channel.hpp"
+#include "../../includes/Client.hpp"
+#include "../../includes/Server.hpp"
 
 void Server::handlePing(Client &client, std::stringstream &ss)
 {

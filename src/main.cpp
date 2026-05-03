@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../includes/Server.hpp"
 
 /*
 check a client is fully registered (completed PASS + NICK + USER)

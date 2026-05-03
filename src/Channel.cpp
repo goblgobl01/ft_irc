@@ -1,5 +1,5 @@
-#include "Client.hpp"
-#include "Channel.hpp"
+#include "../includes/Client.hpp"
+#include "../includes/Channel.hpp"
 #include <sys/socket.h>
 
 Channel::Channel() : userLimit(0), inviteOnly(false), topicRestricted(false) {}
@@ -35,6 +35,7 @@ bool    Channel::isOperator(Client *client) const {
     }
     return (false);
 }
+
 bool    Channel::isInvited(Client *client) const {
     for (size_t i = 0; i < inviteList.size(); i++)
     {
@@ -81,14 +82,11 @@ void    Channel::removeMember(Client *client) {
     {
         if (members[i] == client)
         {
-            if (members[i] == client)
-            {
-                members.erase(members.begin() + i);
-                break ;
-            }
+            members.erase(members.begin() + i);
+            break ;
         }
-        removeOperator(client);
     }
+    removeOperator(client);
 }
 void    Channel::addOperator(Client *client) {
     if (!isOperator(client))

@@ -1,4 +1,4 @@
-#include "Server.hpp"
+#include "../includes/Server.hpp"
 
 Server::Server(std::string port_str, std::string _passwd) : passwd(_passwd) {
 	if (port_str.empty() || port_str.find_first_not_of("0123456789") != std::string::npos)
@@ -37,6 +37,8 @@ void Server::server_init()
 	serverpollfd.events = POLLIN;
 	serverpollfd.revents = 0;
 	sockets.push_back(serverpollfd);
+	client_vector.reserve(100); // ADDED BY AMINE FOR a crash when creating new channel
+    channel_vector.reserve(100);
 }
 
 void Server::accept_new_client()
@@ -231,6 +233,8 @@ void Server::parse_buffer(Client &client)
 	}
 }
 
+// The wrong index (i - 1) erases the wrong client from client_vector
+
 void Server::receive_new_data(int i)
 {
 	char buffer[4096];
@@ -238,13 +242,23 @@ void Server::receive_new_data(int i)
 
 	memset(buffer, 0, 4096);
 	int bytesReceived = recv(sockets[i].fd, buffer, 4096, 0);
-	std::cout << buffer <<std::endl;
+	// std::cout << buffer <<std::endl;
 	if (bytesReceived <= 0)
 	{
 		std::cout << sockets[i].fd << "Client disconnected" << std::endl;
-		close(sockets[i].fd);
-		sockets.erase(sockets.begin() + i);
-		client_vector.erase(client_vector.begin() + (i - 1));
+		// close(sockets[i].fd);
+		// sockets.erase(sockets.begin() + i);
+		// client_vector.erase(client_vector.begin() + (i - 1)); // WRONG INDEX
+		for (size_t n = 0; n < client_vector.size(); n++)
+		{
+			if (client_vector[n].get_client_fd() == sockets[i].fd)
+			{
+				removeClientFromAllChannels(client_vector[n], "Connection reset");
+				remove_a_client(client_vector[n]);
+				break ;
+			}
+		}
+    	return;
 	}
 	else
 	{
@@ -252,15 +266,14 @@ void Server::receive_new_data(int i)
 		{
 			if (client_vector[n].get_client_fd() == sockets[i].fd)
 			{
-				this->client_vector[n].set_buffer(buffer);
+				// this->client_vector[n].set_buffer(buffer);
+                this->client_vector[n].set_buffer(std::string(buffer, bytesReceived));
 				parse_buffer(client_vector[n]);
 			}
 			n++;
 		}
 	}
 }
-
-
 
 void Server::main_loop()
 {

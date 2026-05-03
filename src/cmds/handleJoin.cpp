@@ -1,6 +1,6 @@
-#include "../Channel.hpp"
-#include "../Client.hpp"
-#include "../Server.hpp"
+#include "../../includes/Channel.hpp"
+#include "../../includes/Client.hpp"
+#include "../../includes/Server.hpp"
 
 void    Server::announceJoin(Client &client, Channel *channel, const std::string &channelName)
 {
@@ -33,7 +33,10 @@ void    Server::joinChannel(Client &client, const std::string &channelName, cons
         Channel newChannel(channelName);
         channel_vector.push_back(newChannel);
         channel = &channel_vector.back();
-        channel->addOperator(&client);
+        channel->addOperator(&client); // !!
+        channel->addMember(&client); // !!
+        if (!channelKey.empty())
+            channel->setKey(channelKey);
     }
     else // existing channel
     {

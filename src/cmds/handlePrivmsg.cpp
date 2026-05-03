@@ -1,18 +1,17 @@
-#include "../Channel.hpp"
-#include "../Client.hpp"
-#include "../Server.hpp"
+#include "../../includes/Channel.hpp"
+#include "../../includes/Client.hpp"
+#include "../../includes/Server.hpp"
 
 std::string Server::extractMessage(std::stringstream &ss)
 {
     std::string message;
     std::getline(ss, message);
-    size_t  start = message.find(':');
-    if (start != std::string::npos)
-        return (message.substr(start + 1));
-    size_t  first = message.find_first_not_of(" ");
-    if (first != std::string::npos)
-        return (message.substr(first));
-    return ("");
+    size_t first = message.find_first_not_of(" ");
+    if (first == std::string::npos)
+        return ("");
+    if (message[first] == ':')
+        return (message.substr(first + 1));
+    return (message.substr(first));
 }
 
 void    Server::privmsgToUser(Client &client, const std::string &target, const std::string &message)
@@ -50,9 +49,9 @@ void    Server::privmsgToChannel(Client &client, const std::string &target, cons
 
 void    Server::handlePrivmsg(Client &client, std::stringstream &ss)
 {
-    int fd = client.get_client_fd();
-    std::string nick = client.get_nickname();
     std::string target;
+    std::string nick = client.get_nickname();
+    int         fd = client.get_client_fd();
     if (!(ss >> target))
     {
         send_error(fd, "411", nick, "PRIVMSG", "No recipient given");
