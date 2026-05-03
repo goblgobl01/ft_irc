@@ -13,6 +13,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <fcntl.h>
+#include <cstdlib>
 #include "Client.hpp"
 #include "Channel.hpp"
 

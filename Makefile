@@ -1,29 +1,47 @@
-NAME = ircserv
+NAME     = ircserv
+CXX      := c++
+CXXFLAGS := -Wall -Wextra -Werror -std=c++98 -I./includes
 
-CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98 -g
+#-I./includes : tells the compiler to look in the includes/ folder when resolving headers
 
-SRC = src/main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp\
-		src/cmds/handleMode.cpp src/cmds/handleCmds.cpp src/cmds/utils.cpp src/cmds/handlePart.cpp\
-		src/cmds/handleJoin.cpp src/cmds/handlePing.cpp src/cmds/handlePrivmsg.cpp src/cmds/handleQuit.cpp\
-		src/cmds/handleInvite.cpp src/cmds/handleKick.cpp src/cmds/handleTopic.cpp
-		
-OBJ = $(SRC:%.cpp=obj/%.o)
+OBJDIR  = build
+COREDIR = src/core
+CMDSDIR = src/cmds
+INCDIR  = includes
+
+HEADERS = $(INCDIR)/Channel.hpp $(INCDIR)/Client.hpp $(INCDIR)/Server.hpp
+
+CORE_SRC = main.cpp Server.cpp Client.cpp Channel.cpp
+
+CMDS_SRC = handleCmds.cpp handleMode.cpp handlePart.cpp handleJoin.cpp \
+           handlePing.cpp handlePrivmsg.cpp handleQuit.cpp handleInvite.cpp \
+           handleKick.cpp handleTopic.cpp utils.cpp
+
+
+SRC = $(addprefix $(COREDIR)/, $(CORE_SRC)) $(addprefix $(CMDSDIR)/, $(CMDS_SRC))
+
+OBJ = $(addprefix $(OBJDIR)/, $(SRC:.cpp=.o))
 
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+	@echo "\nCreated executable '$(NAME)'"
 
-obj/%.o: %.cpp
-	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+# @mkdir -p $(dir $@) It needs to create build/src/core/ and build/src/cmds/ subdirectories before compiling into them.
+
+$(OBJDIR)/%.o: %.cpp Makefile $(HEADERS) | $(OBJDIR)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(OBJDIR):
+	@mkdir -p $(OBJDIR)
 
 clean:
-	rm -rf obj
+	@rm -rf $(OBJDIR)
 
 fclean: clean
-	rm -f $(NAME)
+	@rm -f $(NAME)
 
 re: fclean all
 

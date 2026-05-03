@@ -1,6 +1,6 @@
-#include "../../includes/Channel.hpp"
-#include "../../includes/Client.hpp"
-#include "../../includes/Server.hpp"
+#include "Channel.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 
 void	Server::handleCommands(Client &client, std::string &command, std::stringstream &ss)
 {

@@ -1,6 +1,6 @@
-#include "../../includes/Client.hpp"
-#include "../../includes/Server.hpp"
-#include "../../includes/Channel.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
+#include "Channel.hpp"
 
 void    Server::handleInvite(Client &client, std::stringstream &ss)
 {

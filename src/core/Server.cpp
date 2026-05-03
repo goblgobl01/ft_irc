@@ -1,4 +1,4 @@
-#include "../includes/Server.hpp"
+#include "Server.hpp"
 
 Server::Server(std::string port_str, std::string _passwd) : passwd(_passwd) {
 	if (port_str.empty() || port_str.find_first_not_of("0123456789") != std::string::npos)

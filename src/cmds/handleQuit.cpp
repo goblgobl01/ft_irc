@@ -1,6 +1,6 @@
-#include "../../includes/Channel.hpp"
-#include "../../includes/Client.hpp"
-#include "../../includes/Server.hpp"
+#include "Channel.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 
 // void	Server::removeClientFromAllChannels(Client &client) {
 // 	for (size_t i = 0; i < channel_vector.size();)

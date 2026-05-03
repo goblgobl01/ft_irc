@@ -1,4 +1,5 @@
-#include "../includes/Client.hpp"
+#include "Client.hpp"
+
 #include <iostream>
 
 Client::Client(int _client_socket) : client_socket(_client_socket), pass(false), nick(false), user(false){}

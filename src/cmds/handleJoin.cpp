@@ -1,6 +1,6 @@
-#include "../../includes/Channel.hpp"
-#include "../../includes/Client.hpp"
-#include "../../includes/Server.hpp"
+#include "Channel.hpp"
+#include "Client.hpp"
+#include "Server.hpp"
 
 void    Server::announceJoin(Client &client, Channel *channel, const std::string &channelName)
 {

@@ -1,5 +1,6 @@
-#include "../includes/Client.hpp"
-#include "../includes/Channel.hpp"
+#include "Channel.hpp"
+#include "Client.hpp"
+
 #include <sys/socket.h>
 
 Channel::Channel() : userLimit(0), inviteOnly(false), topicRestricted(false) {}
