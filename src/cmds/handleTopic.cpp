@@ -7,18 +7,18 @@ void    Server::handleTopic(Client &client, std::stringstream &ss)
     std::string chanName;
     std::string nick = client.get_nickname();
     int         fd = client.get_client_fd();
-    if (!(ss >> chanName)) // parse channel name
+    if (!(ss >> chanName))
     {
         send_error(fd, "461", nick, "TOPIC", "Not enough parameters");
         return ;
     }
-    Channel *channel = findChannel(chanName); // check if the channel exists
+    Channel *channel = findChannel(chanName);
     if (!channel)
     {
         send_error(fd, "403", nick, chanName, "No such channel");
         return ;
     }
-    if (!channel->isMember(&client)) // check if the client is a channel member
+    if (!channel->isMember(&client))
     {
         send_error(fd, "442", nick, chanName, "You're not on that channel");
         return ;
@@ -34,12 +34,12 @@ void    Server::handleTopic(Client &client, std::stringstream &ss)
             sendToClient(client.get_client_fd(), ":localhost 332 " + client.get_nickname() + " " + chanName + " :" + channel->getTopic());
         return ;
     }
-    if (channel->isTopicRestricted() && !channel->isOperator(&client)) // check permission for setting topic
+    if (channel->isTopicRestricted() && !channel->isOperator(&client))
     {
         send_error(fd, "482", nick, chanName, "You're not channel operator");
         return ;
     }
-    std::string newTopic = rest.substr(first_nonspace);  // set and broadcast the new topic
+    std::string newTopic = rest.substr(first_nonspace);
     if (newTopic[0] == ':')
         newTopic = newTopic.substr(1);
     channel->setTopic(newTopic);

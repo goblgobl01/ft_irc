@@ -36,41 +36,28 @@ class Server {
 		void close_clients();
 		void send_error(int client_fd, std::string code, std::string nickname, std::string command, std::string message);
 		
-		// -------------------- handleJoin -----------------------
-		
+	
 		void    joinChannel(Client &client, const std::string &chanName, const std::string &chanKey);
 		void    announceJoin(Client &client, Channel *channel, const std::string &chanName);
 		
-		// -------------------- handlePrivmsg -----------------------
 		std::string	extractMessage(std::stringstream &ss);
 		void	privmsgToUser(Client &client, const std::string &target, const std::string &message);
 		void	privmsgToChannel(Client &client, const std::string &target, const std::string &message);
 		
-		
-		// -------------------- Utils -----------------------
-
 		std::string	getClientPrefix(Client &client);
 		Channel	*findChannel(const std::string &name);
 		Client	*findClientByNick(const std::string &nickname);
 		void	sendToClient(int fd, const std::string &message);
-		// void	removeClientFromAllChannels(Client &client);
 		void	removeClientFromAllChannels(Client &client, const std::string &reason);
-
 		void	handleCommands(Client &client, std::string &command, std::stringstream &ss);
 		
-		// -------------------- Commands -----------------------
-
 		void	handlePrivmsg(Client &client, std::stringstream &ss);
 		void	handlePing(Client &client, std::stringstream &ss);
-		// void	handleQuit(Client &client);
 		void	handleQuit(Client &client, std::stringstream &ss);
-
-		// -------------------- userCommands -----------------------
-
+		
 		void	handleJoin(Client &client, std::stringstream &ss);
 		void	handlePart(Client &client, std::stringstream &ss);
-
-		// -------------------- operatorCommands -----------------------
+		
 		void	handleKick(Client &client, std::stringstream &ss);
 		void	handleInvite(Client &client, std::stringstream &ss);
 		void	handleTopic(Client &client, std::stringstream &ss);

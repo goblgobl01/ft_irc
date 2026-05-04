@@ -7,19 +7,19 @@ void    Server::handleMode(Client &client, std::stringstream &ss)
     std::string target;
     std::string nick = client.get_nickname();
     int         fd = client.get_client_fd();
-    if (!(ss >> target)) // if no channel name provided
+    if (!(ss >> target))
     {
         send_error(fd, "461", nick, "MODE", "Not enough parameters");
         return ;
     }
-    if (target[0] != '#' && target[0] != '&') // if the channel name do not start with # ro &
+    if (target[0] != '#' && target[0] != '&')
     {
         sendToClient(client.get_client_fd(), ":localhost 221 " + client.get_nickname() + " +");
         return ;
     }
 
     Channel *channel = findChannel(target);
-    if (!channel) // if the channel do not exist
+    if (!channel)
     {
         send_error(fd, "403", nick, target, "No such channel");
         return ;
@@ -40,12 +40,12 @@ void    Server::handleMode(Client &client, std::stringstream &ss)
         send_error(fd, "461", nick, target, "Not enough parameters");
         return ;
     }
-    if (!channel->isMember(&client)) // only mambers can change modes
+    if (!channel->isMember(&client))
     {
         send_error(fd, "442", nick, target, "You're not on that channel");
         return ;
     }
-    if (!channel->isOperator(&client)) // only operators can change modes
+    if (!channel->isOperator(&client))
     {
         send_error(fd, "482", nick, target, "You're not channel operator");
         return ;

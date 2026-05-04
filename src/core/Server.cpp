@@ -37,7 +37,7 @@ void Server::server_init()
 	serverpollfd.events = POLLIN;
 	serverpollfd.revents = 0;
 	sockets.push_back(serverpollfd);
-	client_vector.reserve(100); // ADDED BY AMINE FOR a crash when creating new channel
+	client_vector.reserve(100);
     channel_vector.reserve(100);
 }
 
@@ -233,8 +233,6 @@ void Server::parse_buffer(Client &client)
 	}
 }
 
-// The wrong index (i - 1) erases the wrong client from client_vector
-
 void Server::receive_new_data(int i)
 {
 	char buffer[4096];
@@ -248,7 +246,7 @@ void Server::receive_new_data(int i)
 		std::cout << sockets[i].fd << "Client disconnected" << std::endl;
 		// close(sockets[i].fd);
 		// sockets.erase(sockets.begin() + i);
-		// client_vector.erase(client_vector.begin() + (i - 1)); // WRONG INDEX
+		// client_vector.erase(client_vector.begin() + (i - 1)); // wrong index (i - 1) erases the wrong client
 		for (size_t n = 0; n < client_vector.size(); n++)
 		{
 			if (client_vector[n].get_client_fd() == sockets[i].fd)

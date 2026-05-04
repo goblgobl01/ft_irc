@@ -7,12 +7,11 @@ void    Server::announceJoin(Client &client, Channel *channel, const std::string
     std::string nick = client.get_nickname();
     int         fd = client.get_client_fd();
 
-    channel->broadcastMessage(getClientPrefix(client) + " JOIN " + channelName, NULL); //  broadcast join to all channel members
-    if (!channel->getTopic().empty()) // print channel topic
+    channel->broadcastMessage(getClientPrefix(client) + " JOIN " + channelName, NULL);
+    if (!channel->getTopic().empty())
         sendToClient(fd, ":localhost 332 " + nick + " " + channelName + " :" + channel->getTopic());
-    else // print no channel topic
+    else
         sendToClient(fd, ":localhost 331 " + nick + " " + channelName + " :No topic is set");
-    // display channel members
     sendToClient(fd, ":localhost 353 " + nick + " = " + channelName + " :" + channel->getMemberList());
     sendToClient(fd, ":localhost 366 " + nick + " " + channelName + " :End of /NAMES list");
 }
@@ -22,37 +21,37 @@ void    Server::joinChannel(Client &client, const std::string &channelName, cons
     std::string nick = client.get_nickname();
     int         fd = client.get_client_fd();
 
-    if (channelName.empty() || (channelName[0] != '#' && channelName[0] != '&')) // incorrect or no channel name provided
+    if (channelName.empty() || (channelName[0] != '#' && channelName[0] != '&'))
     {
         send_error(fd, "403", nick, channelName, "No such channel");
         return ;
     }
     Channel *channel = findChannel(channelName);
-    if (channel == NULL) // new channel
+    if (channel == NULL)
     {
         Channel newChannel(channelName);
         channel_vector.push_back(newChannel);
         channel = &channel_vector.back();
-        channel->addOperator(&client); // !!
-        channel->addMember(&client); // !!
+        channel->addOperator(&client);
+        channel->addMember(&client);
         if (!channelKey.empty())
             channel->setKey(channelKey);
     }
-    else // existing channel
+    else
     {
-        if (channel->isMember(&client)) // already a member
+        if (channel->isMember(&client))
             return ;
-        if (channel->getUserLimit() > 0 && (int)channel->memberCount() >= channel->getUserLimit()) // user limit reached
+        if (channel->getUserLimit() > 0 && (int)channel->memberCount() >= channel->getUserLimit())
         {
             send_error(fd, "471", nick, channelName, "Cannot join channel (+l)");
             return ;
         }
-        if (channel->isInviteOnly() && !channel->isInvited(&client)) // not invited for an invit only channel
+        if (channel->isInviteOnly() && !channel->isInvited(&client))
         {
             send_error(fd, "473", nick, channelName, "Cannot join channel (+i)");
             return ;
         }
-        if (!channel->getKey().empty() && channel->getKey() != channelKey) // incorrect channel key
+        if (!channel->getKey().empty() && channel->getKey() != channelKey)
         {
             send_error(fd, "475", nick, channelName, "Cannot join channel (+k)");
             return ;
