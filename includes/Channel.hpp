@@ -55,6 +55,12 @@ class   Channel
 		void		addOperator(Client *client);
 		void		removeInvite(Client *client);
 		void		broadcastMessage(const std::string &message, Client *exclude);
+
+		// Bot
+		std::vector<Client*>& getMembers();
+		// End Bot
+
 };
+
 
 #endif

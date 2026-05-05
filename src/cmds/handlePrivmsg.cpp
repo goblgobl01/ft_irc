@@ -1,6 +1,7 @@
 #include "Channel.hpp"
 #include "Client.hpp"
 #include "Server.hpp"
+#include "Bot.hpp"
 
 std::string Server::extractMessage(std::stringstream &ss)
 {
@@ -63,6 +64,24 @@ void    Server::handlePrivmsg(Client &client, std::stringstream &ss)
         send_error(fd, "412", nick, "PRIVMSG", "No text to send");
         return ;
     }
+
+
+    //  BOT 
+
+    if (target == "IrcBot" && !message.empty() && message[0] == '!')
+    {
+        std::string response = Bot::handleCommand(message, &client, this);
+        std::istringstream rs(response);
+        std::string line;
+        while (std::getline(rs, line))
+        {
+            std::string reply = ":IrcBot!bot@server PRIVMSG " + nick + " :" + line + "\r\n";
+            sendToClient(fd, reply);
+        }
+        return ;
+    }
+    //  END BOT  
+
     if (target[0] == '#' || target[0] == '&')
         privmsgToChannel(client, target, message);
     else

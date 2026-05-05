@@ -11,7 +11,7 @@ INCDIR  = includes
 
 HEADERS = $(INCDIR)/Channel.hpp $(INCDIR)/Client.hpp $(INCDIR)/Server.hpp
 
-CORE_SRC = main.cpp Server.cpp Client.cpp Channel.cpp
+CORE_SRC = main.cpp Server.cpp Client.cpp Channel.cpp Bot.cpp
 
 CMDS_SRC = handleCmds.cpp handleMode.cpp handlePart.cpp handleJoin.cpp \
            handlePing.cpp handlePrivmsg.cpp handleQuit.cpp handleInvite.cpp \
@@ -49,3 +49,7 @@ re: fclean all
 
 run:
 	./$(NAME) 8080 1337
+
+# pass 1337
+# nick ajelloul
+# user ajelloul * 0 : Aboubakr Jelloulat

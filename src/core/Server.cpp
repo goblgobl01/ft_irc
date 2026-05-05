@@ -1,5 +1,20 @@
 #include "Server.hpp"
 
+
+// Bot
+
+std::vector<Client>& Server::getClients() 
+{
+    return client_vector;
+}
+
+std::vector<Channel>& Server::getChannels() 
+{
+    return channel_vector;
+}
+
+// end bot
+
 Server::Server(std::string port_str, std::string _passwd) : passwd(_passwd) {
 	if (port_str.empty() || port_str.find_first_not_of("0123456789") != std::string::npos)
 		throw std::runtime_error("Error: Invalid port characters");

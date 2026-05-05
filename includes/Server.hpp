@@ -62,4 +62,8 @@ class Server {
 		void	handleInvite(Client &client, std::stringstream &ss);
 		void	handleTopic(Client &client, std::stringstream &ss);
 		void	handleMode(Client &client, std::stringstream &ss);
+
+		// Bot
+		std::vector<Client>&  getClients();
+		std::vector<Channel>& getChannels();
 };

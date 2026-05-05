@@ -113,3 +113,11 @@ void    Channel::broadcastMessage(const std::string &message, Client *exclude) {
         }
     }
 }
+
+// Bot
+std::vector<Client*>& Channel::getMembers() 
+{
+    return members;
+}
+
+// end Bot
