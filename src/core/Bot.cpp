@@ -3,7 +3,7 @@
 #include <sstream>
 
 
-// ← constructor REMOVED
+
 
 std::string Bot::handleCommand(const std::string& cmd, Client* sender, Server* server) 
 {
@@ -19,7 +19,7 @@ std::string Bot::handleCommand(const std::string& cmd, Client* sender, Server* s
 std::string Bot::cmdWho(Server* server)
 {
     std::ostringstream oss;
-    std::vector<Channel>& channels = server->getChannels(); // ← vector<Channel> not Channel*
+    std::vector<Channel>& channels = server->getChannels();
 
     if (channels.empty())
         return "No channels found.";
@@ -34,7 +34,7 @@ std::string Bot::cmdWho(Server* server)
         else
             oss << " | Topic: (none)";
         oss << " | Members: ";
-        std::vector<Client*>& members = ch.getMembers(); // ← getMembers()
+        std::vector<Client*>& members = ch.getMembers();
         for (size_t j = 0; j < members.size(); j++)
         {
             oss << members[j]->get_nickname();
@@ -48,7 +48,7 @@ std::string Bot::cmdWho(Server* server)
 std::string Bot::cmdUsers(Server* server)
 {
     std::ostringstream oss;
-    std::vector<Client>& clients = server->getClients(); // ← vector<Client> not Client*
+    std::vector<Client>& clients = server->getClients(); 
     if (clients.empty())
         return "No users connected.";
     oss << "Connected users (" << clients.size() << "): ";
@@ -63,12 +63,12 @@ std::string Bot::cmdUsers(Server* server)
 std::string Bot::cmdChannels(Server* server)
 {
     std::ostringstream oss;
-    std::vector<Channel>& channels = server->getChannels(); // ← vector<Channel>
+    std::vector<Channel>& channels = server->getChannels(); 
     if (channels.empty())
         return "No channels exist yet.";
     oss << "Channels (" << channels.size() << "): ";
     for (size_t i = 0; i < channels.size(); i++)
-        oss << channels[i].getName() << " "; // ← dot not arrow
+        oss << channels[i].getName() << " "; 
     return oss.str();
 }
 
@@ -88,11 +88,11 @@ std::string Bot::cmdHelp()
             "!time     - Show current server time\n"
             "!users    - List all connected users\n"
             "!channels - List all channels\n"
-            "!help     - Show this help message\n"
+            "!help     - Show help message\n"
             "=======================\n"
             "How to connect:\n"
-            "  ./ircserv 8080 8080 1337\n"
+            "  ./ircserv 8080 1337\n"
             "  PASS 1337\n"
             "  NICK yournick\n"
-            "  USER yournick * 0 :Your Name";
+            "  USER username * 0 :Your Name";
 }

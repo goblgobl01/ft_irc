@@ -50,6 +50,3 @@ re: fclean all
 run:
 	./$(NAME) 8080 1337
 
-# pass 1337
-# nick ajelloul
-# user ajelloul * 0 : Aboubakr Jelloulat

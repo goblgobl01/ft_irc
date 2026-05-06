@@ -4,7 +4,6 @@
 
 /*
         TOPIC <channel> [:<topic>]
-    View or change the topic of a channel.
 
     Behaviour:
       TOPIC #chan           view current topic
@@ -42,11 +41,10 @@ void    Server::handleTopic(Client &client, std::stringstream &ss)
         return ;
     }
 
-    // -- Read the rest of the line after the channel name 
+
     std::string rest;
     std::getline(ss, rest);
 
-    // Find first non space character to check if a topic argument was given
     size_t firstNonSpace = rest.find_first_not_of(" \t");
 
     // No topic argument: view mode 

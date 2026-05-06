@@ -2,21 +2,8 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 
-/*
-    KICK <channel> <user> [:<reason>]
+// KICK <channel> <user> [:<reason>]
 
-    Ejects a user from a channel. Only channel operators may use KICK.
-
-Behaviour:
-   - The kick message is broadcast to ALL members (including the target)
-        BEFORE the target is removed, so they receive the notification.
-   - If the target was an operator, they are removed from the ops list too.
-   - If the target was on the invite list the invite is revoked so they
-        cannot silently rejoin an invite only channel.
-   - If the channel becomes empty after the kick, it is destroyed.
-   - Reason defaults to the kicker's nickname if none is supplied.
-
-*/
 
 void    Server::handleKick(Client &client, std::stringstream &ss)
 {
@@ -39,17 +26,15 @@ void    Server::handleKick(Client &client, std::stringstream &ss)
     size_t colon = reason.find(':');
     if (colon != std::string::npos)
     {
-        // Standard IRC trailing param: everything after ':'
         reason = reason.substr(colon + 1);
     }
     else
     {
-        // No colon: trim leading spaces
         size_t first = reason.find_first_not_of(" \t");
         reason = (first != std::string::npos) ? reason.substr(first) : "";
     }
 
-    // Default reason is kicker's nickname (common IRC convention)
+
     if (reason.empty())
         reason = nick;
 
@@ -86,7 +71,7 @@ void    Server::handleKick(Client &client, std::stringstream &ss)
     //  Broadcast KICK to everyone (including target) BEFORE removal 
     channel->broadcastMessage(getClientPrefix(client) + " KICK " + channelName + " " + targetNick + " :" + reason, NULL);
 
-    // --- Clean up: remove from operators list if applicable 
+    // remove from operators list if applicable 
     if (channel->isOperator(target))
         channel->removeOperator(target);
 
