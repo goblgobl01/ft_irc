@@ -28,25 +28,16 @@ void    Server::handleMode(Client &client, std::stringstream &ss)
     ss >> mode;
     if (mode.empty())
     {
-        std::string modes = "+";
-        std::string params = "";
+        std::string modes = "+"; 
         if (channel->isInviteOnly())
             modes += "i";
         if (channel->isTopicRestricted())
             modes += "t";
         if (!channel->getKey().empty())
-        {
             modes += "k";
-            params += " " + channel->getKey();
-        }
         if (channel->getUserLimit() > 0)
-        {
             modes += "l";
-            std::stringstream ls;
-            ls << channel->getUserLimit();
-            params += " " + ls.str();
-        }
-        sendToClient(fd, ":localhost 324 " + nick + " " + target + " " + modes + params);
+        sendToClient(fd, ":localhost 324 " + nick + " " + target + " " + modes);
         return ;
     }
     if (mode.size() != 2 || (mode[0] != '+' && mode[0] != '-')
@@ -97,7 +88,13 @@ void    Server::handleMode(Client &client, std::stringstream &ss)
         }
         else
         {
-            int limit = std::atoi(arg.c_str());
+            std::stringstream ls(arg);
+            int limit;
+            if (!(ls >> limit) || limit <= 0)
+            {
+                send_error(fd, "461", nick, "MODE", "Not enough parameters");
+                return ;
+            }
             channel->setUserLimit(limit);
         }
     }

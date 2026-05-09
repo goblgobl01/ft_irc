@@ -3,7 +3,7 @@
 
 #include <sys/socket.h>
 
-Channel::Channel() : userLimit(0), inviteOnly(false), topicRestricted(false) {}
+Channel::Channel() : userLimit(0), inviteOnly(false), topicRestricted(true) {}
 Channel::Channel(const std::string &name) : userLimit(0), inviteOnly(false), topicRestricted(false), name(name) {}
 Channel::~Channel() {}
 
