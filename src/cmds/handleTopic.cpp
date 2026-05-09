@@ -41,7 +41,6 @@ void    Server::handleTopic(Client &client, std::stringstream &ss)
         return ;
     }
 
-
     std::string rest;
     std::getline(ss, rest);
 

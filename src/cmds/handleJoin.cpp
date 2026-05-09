@@ -23,7 +23,7 @@ void    Server::joinChannel(Client &client, const std::string &channelName, cons
 
     if (channelName.empty() || (channelName[0] != '#' && channelName[0] != '&'))
     {
-        send_error(fd, "403", nick, channelName, "No such channel");
+        send_error(fd, "476", nick, channelName, "Bad channel mask");
         return ;
     }
     Channel *channel = findChannel(channelName);

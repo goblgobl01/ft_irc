@@ -64,7 +64,7 @@ void    Server::handleKick(Client &client, std::stringstream &ss)
     Client *target = findClientByNick(targetNick);
     if (!target || !channel->isMember(target))
     {
-        send_error(fd, "441", nick, targetNick + " " + channelName, "They aren't on that channel");
+        send_error(fd, "401", nick, targetNick + " " + channelName, "They aren't on that channel");
         return ;
     }
 

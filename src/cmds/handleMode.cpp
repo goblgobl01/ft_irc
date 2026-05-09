@@ -24,10 +24,23 @@ void    Server::handleMode(Client &client, std::stringstream &ss)
         send_error(fd, "403", nick, target, "No such channel");
         return ;
     }
-    
     std::string mode;
     ss >> mode;
-    if (mode.empty() || mode.size() != 2 || (mode[0] != '+' && mode[0] != '-')
+    if (mode.empty())
+    {
+        std::string modes = "+"; 
+        if (channel->isInviteOnly())
+            modes += "i";
+        if (channel->isTopicRestricted())
+            modes += "t";
+        if (!channel->getKey().empty())
+            modes += "k";
+        if (channel->getUserLimit() > 0)
+            modes += "l";
+        sendToClient(fd, ":localhost 324 " + nick + " " + target + " " + modes);
+        return ;
+    }
+    if (mode.size() != 2 || (mode[0] != '+' && mode[0] != '-')
         || (mode[1] != 'i' && mode[1] != 't' && mode[1] != 'k' && mode[1] != 'o' && mode[1] != 'l'))
     {
         send_error(fd, "472", nick, target, "Invalid mode");
@@ -75,7 +88,13 @@ void    Server::handleMode(Client &client, std::stringstream &ss)
         }
         else
         {
-            int limit = std::atoi(arg.c_str());
+            std::stringstream ls(arg);
+            int limit;
+            if (!(ls >> limit) || limit <= 0)
+            {
+                send_error(fd, "461", nick, "MODE", "Not enough parameters");
+                return ;
+            }
             channel->setUserLimit(limit);
         }
     }
