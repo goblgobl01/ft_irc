@@ -103,6 +103,7 @@ void    Channel::removeInvite(Client *client) {
         }
     }
 }
+
 void    Channel::broadcastMessage(const std::string &message, Client *exclude) {
     for (size_t i = 0; i < members.size(); i++)
     {

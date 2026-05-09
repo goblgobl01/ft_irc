@@ -8,6 +8,7 @@ class Client {
 		bool		pass;
 		bool		nick;
 		bool		user;
+		bool		auth;
 		std::string	buffer;
 		std::string	nickname;
 		std::string	username;
@@ -20,9 +21,11 @@ class Client {
 		bool pass_status() const;
 		bool nick_status() const;
 		bool user_status() const;
+		bool auth_status() const;
 		void set_pass(bool status);
 		void set_nick(bool status);
 		void set_user(bool status);
+		void set_auth(bool status);
 		void set_username(const std::string &u);
 		void set_realname(const std::string &r);
 		std::string get_username() const;

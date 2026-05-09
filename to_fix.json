@@ -5,4 +5,3 @@
 <!-- when a nickname is changed you need to remove the old one so a new user can use it -->
 <!-- when you auth , in user you need to respect the syntax -->
 <!-- needs to be fixing some error msgs in JOIN // NICK change // invalid NICK //JOIN without # prefix //KICK non-existent user //   TOPIC change without operstor privleges // MODE query — RPL_CHANNELMODEI //  Combined modes +il 5 needs to handle mutiple mods at the same time// -->
-

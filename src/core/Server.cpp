@@ -5,12 +5,12 @@
 
 std::vector<Client>& Server::getClients() 
 {
-    return client_vector;
+	return client_vector;
 }
 
 std::vector<Channel>& Server::getChannels() 
 {
-    return channel_vector;
+	return channel_vector;
 }
 
 // end bot
@@ -45,7 +45,7 @@ void Server::server_init()
 	hint.sin_port = htons(this->port);
 	inet_pton(AF_INET, "0.0.0.0", &hint.sin_addr);
 	if (bind(this->server_socket, (struct sockaddr *)&hint, sizeof(hint)) == -1)
-		throw std::runtime_error("Error: FCNTL system call failed");
+		throw std::runtime_error("Error: BIND system call failed");
 	if (listen(this->server_socket, SOMAXCONN) == -1)
 		throw std::runtime_error("Error: listen failed");
 	serverpollfd.fd = this->server_socket;
@@ -53,7 +53,7 @@ void Server::server_init()
 	serverpollfd.revents = 0;
 	sockets.push_back(serverpollfd);
 	client_vector.reserve(100);
-    channel_vector.reserve(100);
+	channel_vector.reserve(100);
 }
 
 void Server::accept_new_client()
@@ -126,7 +126,24 @@ std::string string_to_upper(std::string _string)
 void Server::send_error(int client_fd, std::string code, std::string nickname, std::string command, std::string message)
 {
 	std::string response = ":localhost " + code + " " + nickname + " " + command + " :" + message + "\r\n";
-	send(client_fd, response.c_str(), response.length(), 0);
+	sendToClient(client_fd, response);
+}
+
+int check_special_characters(const std::string& str)
+{
+	std::string allowed_symbols = "-[]\\`^{}|_";
+
+	for (std::string::size_type i = 0; i < str.length(); ++i) {
+		unsigned char c = static_cast<unsigned char>(str[i]);
+		if (std::isalnum(c)) {
+			continue;
+		}
+		if (allowed_symbols.find(str[i]) != std::string::npos) {
+			continue;
+		}
+		return 1;
+	}
+	return 0;
 }
 
 void Server::parse_buffer(Client &client)
@@ -159,12 +176,13 @@ void Server::parse_buffer(Client &client)
 			}
 			else
 			{
-				remove_a_client(client);
-				return ;
+				send_error(client.get_client_fd(), "464", "*", "PASS", "wrong passwd");
+				continue ;
 			}
 		}
 		else if (command == "NICK")
 		{
+
 			if (!client.pass_status())
 			{
 				send_error(client.get_client_fd(), "451", "*", "NICK", "not authenticated yet");
@@ -173,6 +191,17 @@ void Server::parse_buffer(Client &client)
 			else if (!(ss >> content))
 			{
 				send_error(client.get_client_fd(), "431", "*", "NICK", "No nickname given");
+				continue ;
+			}
+			if (isdigit(content[0]) || content[0] == '~' || content.length() > 9)
+			{
+				send_error(client.get_client_fd(), "432", content, "NICK", "nickname error");
+				continue ;
+			}
+			if (check_special_characters(content))
+			{
+				std::cout << content << std::endl;
+				send_error(client.get_client_fd(), "432", content, "NICK", "nickname error");
 				continue ;
 			}
 			bool found_duplicate = false;
@@ -190,15 +219,37 @@ void Server::parse_buffer(Client &client)
 			}
 			if (!found_duplicate)
 			{
+				std::string old_nick = client.get_nickname();
+				std::string new_nick = content;
+				std::string prefix = ":" + old_nick + "!" + client.get_username() + "@localhost";
+				std::string broadcast_msg = prefix + " NICK :" + new_nick + "\r\n";
 				client.set_nick(true);
-				client.set_nickname(content);
+				client.set_nickname(new_nick);
+				if (client.is_registered())
+				{
+					sendToClient(client.get_client_fd(), broadcast_msg);
+					for (size_t i = 0; i < channel_vector.size(); ++i)
+					{
+						if (channel_vector[i].isMember(&client))
+							channel_vector[i].broadcastMessage(broadcast_msg, &client);
+					}
+				}
 			}
 			else
 				send_error(client.get_client_fd(), "433", "*", content, "Nickname is already in use");
-			if (client.is_registered())
+			if (client.is_registered() && client.auth_status() == false)
 			{
-				std::string welcome = ":localhost 001 " + client.get_nickname() + " :Welcome to the Internet Relay Network " + client.get_nickname() + "\r\n";
-				send(client.get_client_fd(), welcome.c_str(), welcome.length(), 0);
+				std::string nick = client.get_nickname();
+				std::string rpl;
+				rpl = ":localhost 001 " + nick + " :Welcome to the Internet Relay Network " + nick + "\r\n";
+				sendToClient(client.get_client_fd(), rpl);
+				rpl = ":localhost 002 " + nick + " :Your host is localhost, running version 1.0\r\n";
+				sendToClient(client.get_client_fd(), rpl);
+				rpl = ":localhost 003 " + nick + " :This server was created May 09 2026\r\n";
+				sendToClient(client.get_client_fd(), rpl);
+				rpl = ":localhost 004 " + nick + " localhost 1.0 i tkol\r\n";
+				sendToClient(client.get_client_fd(), rpl);
+				client.set_auth(true);
 			}
 		}
 		else if (command == "USER")
@@ -220,27 +271,40 @@ void Server::parse_buffer(Client &client)
 				continue;
 			}
 			std::getline(ss, real);
-			if (real.empty() || real.find_first_not_of(" \t\r\n") == std::string::npos)
+			size_t first_non_space = real.find_first_not_of(" \t");
+			if (first_non_space == std::string::npos)
 			{
 				send_error(client.get_client_fd(), "461", client.get_nickname().empty() ? "*" : client.get_nickname(), "USER", "Not enough parameters");
 				continue;
 			}
-			size_t colon_pos = real.find(':');
-			if (colon_pos != std::string::npos)
-				real = real.substr(colon_pos + 1);
-			else
+			std::string trailing = real.substr(first_non_space);
+			if (trailing[0] != ':')
 			{
-				size_t first = real.find_first_not_of(" ");
-				if (first != std::string::npos)
-					real = real.substr(first);
+				send_error(client.get_client_fd(), "461", client.get_nickname().empty() ? "*" : client.get_nickname(), "USER", "Real name must start with ':'");
+				continue;
+			}
+			std::string final_real_name = trailing.substr(1);
+			if (final_real_name.empty())
+			{
+				send_error(client.get_client_fd(), "461", client.get_nickname().empty() ? "*" : client.get_nickname(), "USER", "Real name cannot be empty");
+				continue;
 			}
 			client.set_username(user);
-			client.set_realname(real);
+			client.set_realname(final_real_name);
 			client.set_user(true);
-			if (client.is_registered())
+			if (client.is_registered() && client.auth_status() == false)
 			{
-				std::string welcome = ":localhost 001 " + client.get_nickname() + " :Welcome to our Internet Relay Network " + client.get_nickname() + "\r\n";
-				send(client.get_client_fd(), welcome.c_str(), welcome.length(), 0);
+				std::string nick = client.get_nickname();
+				std::string rpl;
+				rpl = ":localhost 001 " + nick + " :Welcome to the Internet Relay Network " + nick + "\r\n";
+				sendToClient(client.get_client_fd(), rpl);
+				rpl = ":localhost 002 " + nick + " :Your host is localhost, running version 1.0\r\n";
+				sendToClient(client.get_client_fd(), rpl);
+				rpl = ":localhost 003 " + nick + " :This server was created May 09 2026\r\n";
+				sendToClient(client.get_client_fd(), rpl);
+				rpl = ":localhost 004 " + nick + " localhost 1.0 i tkol\r\n";
+				sendToClient(client.get_client_fd(), rpl);
+				client.set_auth(true);
 			}
 		}
 		else
@@ -255,13 +319,9 @@ void Server::receive_new_data(int i)
 
 	memset(buffer, 0, 4096);
 	int bytesReceived = recv(sockets[i].fd, buffer, 4096, 0);
-	// std::cout << buffer <<std::endl;
 	if (bytesReceived <= 0)
 	{
 		std::cout << sockets[i].fd << "Client disconnected" << std::endl;
-		// close(sockets[i].fd);
-		// sockets.erase(sockets.begin() + i);
-		// client_vector.erase(client_vector.begin() + (i - 1)); // wrong index (i - 1) erases the wrong client
 		for (size_t n = 0; n < client_vector.size(); n++)
 		{
 			if (client_vector[n].get_client_fd() == sockets[i].fd)
@@ -271,7 +331,7 @@ void Server::receive_new_data(int i)
 				break ;
 			}
 		}
-    	return;
+		return;
 	}
 	else
 	{
@@ -279,8 +339,7 @@ void Server::receive_new_data(int i)
 		{
 			if (client_vector[n].get_client_fd() == sockets[i].fd)
 			{
-				// this->client_vector[n].set_buffer(buffer);
-                this->client_vector[n].set_buffer(std::string(buffer, bytesReceived));
+				this->client_vector[n].set_buffer(std::string(buffer, bytesReceived));
 				parse_buffer(client_vector[n]);
 			}
 			n++;
