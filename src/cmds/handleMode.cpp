@@ -24,10 +24,26 @@ void    Server::handleMode(Client &client, std::stringstream &ss)
         send_error(fd, "403", nick, target, "No such channel");
         return ;
     }
-    
     std::string mode;
     ss >> mode;
-    if (mode.empty() || mode.size() != 2 || (mode[0] != '+' && mode[0] != '-')
+    if (mode.empty())
+    {
+        std::string modes = "+";
+        std::string params = "";
+        if (channel->isInviteOnly())      modes += "i";
+        if (channel->isTopicRestricted()) modes += "t";
+        if (!channel->getKey().empty())   { modes += "k"; params += " " + channel->getKey(); }
+        if (channel->getUserLimit() > 0)
+        {
+            modes += "l";
+            std::stringstream ls;
+            ls << channel->getUserLimit();
+            params += " " + ls.str();
+        }
+        sendToClient(fd, ":localhost 324 " + nick + " " + target + " " + modes + params);
+        return ;
+    }
+    if (mode.size() != 2 || (mode[0] != '+' && mode[0] != '-')
         || (mode[1] != 'i' && mode[1] != 't' && mode[1] != 'k' && mode[1] != 'o' && mode[1] != 'l'))
     {
         send_error(fd, "472", nick, target, "Invalid mode");
