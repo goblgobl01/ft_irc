@@ -30,9 +30,15 @@ void    Server::handleMode(Client &client, std::stringstream &ss)
     {
         std::string modes = "+";
         std::string params = "";
-        if (channel->isInviteOnly())      modes += "i";
-        if (channel->isTopicRestricted()) modes += "t";
-        if (!channel->getKey().empty())   { modes += "k"; params += " " + channel->getKey(); }
+        if (channel->isInviteOnly())
+            modes += "i";
+        if (channel->isTopicRestricted())
+            modes += "t";
+        if (!channel->getKey().empty())
+        {
+            modes += "k";
+            params += " " + channel->getKey();
+        }
         if (channel->getUserLimit() > 0)
         {
             modes += "l";
