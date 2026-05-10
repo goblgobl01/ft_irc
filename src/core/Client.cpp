@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-Client::Client(int _client_socket) : client_socket(_client_socket), pass(false), nick(false), user(false){}
+Client::Client(int _client_socket) : client_socket(_client_socket), pass(false), nick(false), user(false), auth(false){}
 
 int Client::get_client_fd() {
 	return (client_socket);
@@ -19,9 +19,11 @@ std::string &Client::get_buffer() {
 bool Client::pass_status() const { return this->pass; }
 bool Client::nick_status() const { return this->nick; }
 bool Client::user_status() const { return this->user; }
+bool Client::auth_status() const { return this->auth; }
 void Client::set_pass(bool status) { this->pass = status; }
 void Client::set_nick(bool status) { this->nick = status; }
 void Client::set_user(bool status) { this->user = status; }
+void Client::set_auth(bool status) { this->auth = status; }
 void Client::set_username(const std::string &u) { this->username = u; }
 void Client::set_realname(const std::string &r) { this->realname = r; }
 std::string Client::get_username() const { return this->username; }
